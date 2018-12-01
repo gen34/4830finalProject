@@ -1,0 +1,136 @@
+<div nz-row>
+    <div nz-col nzSpan="4"></div>
+    <div nz-col nzSpan="16">
+  
+      <nz-card [nzBordered]="false" [nzTitle]="nzTitleI" [nzExtra]="extraTemplate">
+  
+        <ng-template #nzTitleI>
+          <a (click)="get()">Informations</a>
+        </ng-template>
+        <nz-input-group nzSearch [nzSuffix]="suffixButton">
+          <input type="text" nz-input [(ngModel)]="searchText" placeholder="input search text">
+        </nz-input-group>
+        <ng-template #suffixButton>
+          <button nz-button nzType="primary" nzSearch (click)="search()">Search</button>
+        </ng-template>
+   
+        <nz-list nzItemLayout="vertical">
+          <nz-list-item *ngFor="let item of items" [nzActions]="[githubOp]">
+            <nz-divider></nz-divider>
+            <nz-list-item-meta [nzTitle]="nzTitle" [nzAvatar]="githubAvatar" [nzDescription]="nzDescription">
+              <ng-template #githubAvatar>
+                <nz-avatar nzIcon="anticon anticon-user"></nz-avatar>
+              </ng-template>
+              <ng-template #nzTitle>
+                {{item.username}}
+              </ng-template>
+              <ng-template #nzDescription>
+                <div class="mt-md d-flex">
+                  {{item.content}}
+                </div>
+                <br>
+                <img width="272" alt="logo" *ngIf="item.image!=''" src="{{item.image}}">
+              </ng-template>
+            </nz-list-item-meta>
+            <ng-template #githubOp>
+              <a *ngIf="item.username==user.username" (click)="del(item)">删除</a>
+            </ng-template>
+          </nz-list-item>
+        </nz-list>
+        <nz-divider *ngIf="items.length==0 && searchText!=''" nzText="No Results"></nz-divider>
+    
+  
+      </nz-card>
+  
+      <ng-template #extraTemplate>
+        <div *ngIf="user._id==''">
+          <a (click)="showLoginModal()">Login</a>
+          <nz-divider nzType="vertical"></nz-divider>
+          <a (click)="showRegisterModal()">Register</a>
+        </div>
+  
+        <div *ngIf="user._id!=''">
+  
+          Hello {{user.username}} !
+          <nz-divider nzType="vertical"></nz-divider>
+          <a (click)="logout()">Logout</a>
+          <nz-divider nzType="vertical"></nz-divider>
+          <a (click)="showPOSTModal()">POST</a>
+        </div>
+      </ng-template>
+  
+  
+  
+      <nz-modal [(nzVisible)]="isLoginVisible" nzTitle="Login" [nzFooter]="modalFooter1" (nzOnCancel)="handleCancel()">
+        <nz-form-item>
+          <nz-form-label [nzSm]="6" [nzXs]="24" nzFor="" nzRequired>UserName</nz-form-label>
+          <nz-form-control [nzSm]="14" [nzXs]="24">
+            <input nz-input placeholder="" [(ngModel)]="user.username">
+          </nz-form-control>
+        </nz-form-item>
+        <nz-form-item>
+          <nz-form-label [nzSm]="6" [nzXs]="24" nzFor="" nzRequired>Password</nz-form-label>
+          <nz-form-control [nzSm]="14" [nzXs]="24">
+            <input nz-input type="password" placeholder="" [(ngModel)]="user.password">
+          </nz-form-control>
+        </nz-form-item>
+  
+        <ng-template #modalFooter1>
+          <button nz-button nzType="default" (click)="handleCancel()">Close</button>
+          <button nz-button nzType="primary" (click)="login()">Login</button>
+        </ng-template>
+      </nz-modal>
+  
+  
+      <nz-modal [(nzVisible)]="isRegisterVisible" nzTitle="Register" [nzFooter]="modalFooter2" (nzOnCancel)="handleCancel()">
+        <nz-form-item>
+          <nz-form-label [nzSm]="6" [nzXs]="24" nzFor="" nzRequired>UserName</nz-form-label>
+          <nz-form-control [nzSm]="14" [nzXs]="24">
+            <input nz-input placeholder="" [(ngModel)]="user.username">
+          </nz-form-control>
+        </nz-form-item>
+        <nz-form-item>
+          <nz-form-label [nzSm]="6" [nzXs]="24" nzFor="" nzRequired>Password</nz-form-label>
+          <nz-form-control [nzSm]="14" [nzXs]="24">
+            <input nz-input type="password" placeholder="" [(ngModel)]="user.password">
+          </nz-form-control>
+        </nz-form-item>
+        <nz-form-item>
+          <nz-form-label [nzSm]="6" [nzXs]="24" nzFor="" nzRequired>Password</nz-form-label>
+          <nz-form-control [nzSm]="14" [nzXs]="24">
+            <input nz-input type="password" placeholder="" [(ngModel)]="user.enterpassword">
+          </nz-form-control>
+        </nz-form-item>
+        <ng-template #modalFooter2>
+          <button nz-button nzType="default" (click)="handleCancel()">Close</button>
+          <button nz-button nzType="primary" (click)="register()">Register</button>
+        </ng-template>
+      </nz-modal>
+  
+  
+      <nz-modal [(nzVisible)]="isPOSTVisible" nzTitle="POST" [nzFooter]="modalFooter3" (nzOnCancel)="handleCancel()">
+        <nz-form-item>
+          <textarea rows="4" placeholder="Please input your content..." nz-input [(ngModel)]="content.content"></textarea>
+        </nz-form-item>
+        <nz-form-item>
+          <nz-upload class="avatar-uploader" [nzAction]="uploadUrl" nzName="recfile" nzListType="picture-card"
+            [nzShowUploadList]="false" [nzBeforeUpload]="beforeUpload" (nzChange)="handleChange($event)">
+            <ng-container *ngIf="!avatarUrl">
+              <i nz-icon type="plus"></i>
+              <div class="ant-upload-text">Upload</div>
+            </ng-container>
+            <img *ngIf="avatarUrl" [src]="avatarUrl" class="avatar" style="width:100px;height:100px;">
+          </nz-upload>
+        </nz-form-item>
+  
+        <ng-template #modalFooter3>
+          <button nz-button nzType="default" (click)="handleCancel()">Close</button>
+          <button nz-button nzType="primary" (click)="post()">POST</button>
+        </ng-template>
+      </nz-modal>
+  
+  
+  
+    </div>
+    <div nz-col nzSpan="4"></div>
+  </div>
